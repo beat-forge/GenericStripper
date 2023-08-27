@@ -35,6 +35,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: |
-            bin/Release/net6.0/GenericStripper.exe
-          asset_name: GenericStripper.exe
+            bin/Release/net6.0/GenericStripper.dll
+          asset_name: GenericStripper.dll
           tag: ${{ github.ref }}
