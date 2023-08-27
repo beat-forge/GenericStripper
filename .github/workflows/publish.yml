@@ -1,9 +1,9 @@
 name: Publish
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [released]
+
 env:
   GH_TOKEN: ${{ github.token }}
 
@@ -36,4 +36,4 @@ jobs:
         run: 7z a -tzip -mx=9 GenericStripper.zip GenericStripper/bin/Release/net7.0/
 
       - name: Publish to Release
-        run: gh release upload ${{ github.ref }} GenericStripper.zip --clobber
+        run: gh release upload ${{ github.ref_name }} GenericStripper.zip --clobber
