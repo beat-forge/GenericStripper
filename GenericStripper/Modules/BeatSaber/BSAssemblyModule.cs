@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using Mono.Cecil;
+using Mono.Cecil.Rocks;
 
 namespace GenericStripper.Modules.BeatSaber;
 
@@ -7,6 +9,8 @@ public class BsAssemblyModule
     private readonly BsLibLoader _bslibLoader;
     private readonly FileInfo _file;
     private readonly ModuleDefinition _module;
+
+    private TypeReference? _inasmref;
 
     public BsAssemblyModule(string gamePath, string fileName, params string[] resolverDirs)
     {
@@ -44,7 +48,7 @@ public class BsAssemblyModule
         foreach (var type in _module.Types) VirtualizeType(type);
     }
 
-    private static void VirtualizeType(TypeDefinition type)
+    private void VirtualizeType(TypeDefinition type)
     {
         if (type.IsSealed) type.IsSealed = false;
 
@@ -53,14 +57,32 @@ public class BsAssemblyModule
 
         foreach (var subType in type.NestedTypes) VirtualizeType(subType);
 
-        foreach (var m in type.Methods.Where(m => m.IsManaged
-                                                  && m is
-                                                  {
-                                                      IsIL: true, IsStatic: false, IsVirtual: false, IsAbstract: false,
-                                                      IsAddOn: false, IsConstructor: false, IsSpecialName: false,
-                                                      IsGenericInstance: false, HasOverrides: false
-                                                  }))
+        foreach (var m in type.Methods.Where(m => m.IsManaged && m is
+                 {
+                     IsIL: true, IsStatic: false, IsVirtual: false, IsAbstract: false, IsAddOn: false,
+                     IsConstructor: false, IsSpecialName: false, IsGenericInstance: false, HasOverrides: false
+                 }))
         {
+            foreach (var p in m.Parameters.Where(p => p.IsIn))
+            {
+                _inasmref ??= _module.ImportReference(typeof(InAttribute));
+                List<TypeReference> opt = new();
+                List<TypeReference> req = new();
+                while (_inasmref is IModifierType modType)
+                {
+                    if (_inasmref.IsOptionalModifier) opt.Add(modType.ModifierType);
+                    else req.Add(modType.ModifierType);
+                    _inasmref = modType.ElementType;
+                }
+
+                if (!req.Contains(_inasmref)) req.Add(_inasmref);
+                foreach (var typeReference in req) _inasmref = _inasmref.MakeRequiredModifierType(typeReference);
+
+                foreach (var typeReference in opt) _inasmref = _inasmref.MakeOptionalModifierType(typeReference);
+
+                p.ParameterType = _inasmref;
+            }
+
             m.IsVirtual = true;
             m.IsPublic = true;
             m.IsPrivate = false;

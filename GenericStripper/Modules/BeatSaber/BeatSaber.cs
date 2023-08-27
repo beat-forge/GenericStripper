@@ -22,6 +22,51 @@ public class BeatSaber : IModule
     public string GameName => "Beat Saber";
     public string GamePath { get; }
 
+    public void StripDll(string file, string outDir, params string[] resolveDirs)
+    {
+        if (!File.Exists(file)) throw new FileNotFoundException("Failed to find assembly to strip!", file);
+        var fileInf = new FileInfo(file);
+
+        var bsAssemblyModule = new BsAssemblyModule(GamePath, file, resolveDirs);
+        bsAssemblyModule.Virtualize();
+        bsAssemblyModule.Strip();
+
+        Directory.CreateDirectory(Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.Directory!.ToString())));
+        var outFile = Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.FullName));
+        bsAssemblyModule.Write(outFile);
+    }
+
+    public async Task StripAllDlls(string outDir)
+    {
+        await InstallBsipa();
+
+        var bsLibsDir = Path.Combine(GamePath, "Libs");
+        var bsManagedDir = Path.Combine(GamePath, "Beat Saber_Data", "Managed");
+
+        var outputDir = Path.Combine(GamePath, outDir);
+        if (!Directory.Exists(outputDir)) Directory.CreateDirectory(outputDir);
+
+        var libAssemblies = Directory.GetFiles(bsLibsDir, "*.dll", SearchOption.AllDirectories);
+        var managedAssemblies = Directory.GetFiles(bsManagedDir, "*.dll", SearchOption.AllDirectories);
+
+        AnsiConsole.Progress()
+            .Start(ctx =>
+                {
+                    var task = ctx.AddTask("[salmon1]Stripping assemblies...[/]", new ProgressTaskSettings
+                    {
+                        MaxValue = libAssemblies.Length + managedAssemblies.Length
+                    });
+
+                    foreach (var assembly in libAssemblies.Concat(managedAssemblies))
+                    {
+                        StripDll(assembly, outputDir, bsLibsDir, bsManagedDir);
+                        task.Increment(1);
+                        AnsiConsole.MarkupLine($"[teal]Stripped {assembly}[/]");
+                    }
+                }
+            );
+    }
+
 
     private async Task InstallBsipa()
     {
@@ -65,60 +110,15 @@ public class BeatSaber : IModule
                     {
                         FileName = Path.Combine(GamePath, "IPA.exe"),
                         WorkingDirectory = GamePath,
-                        Arguments = "--nowait",
+                        Arguments = "--nowait"
                     }
                 };
-                
+
                 bsipa.Start();
                 await bsipa.WaitForExitAsync();
-                
+
                 if (bsipa.ExitCode != 0) throw new Exception("Failed to install BSIPA!");
                 ctx.Status("[green]BSIPA installed![/]");
             });
-    }
-
-    public void StripDll(string file, string outDir, params string[] resolveDirs)
-    {
-        if (!File.Exists(file)) throw new FileNotFoundException("Failed to find assembly to strip!", file);
-        var fileInf = new FileInfo(file);
-
-        var bsAssemblyModule = new BsAssemblyModule(GamePath, file, resolveDirs);
-        bsAssemblyModule.Virtualize();
-        bsAssemblyModule.Strip();
-
-        Directory.CreateDirectory(Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.Directory!.ToString())));
-        var outFile = Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.FullName));
-        bsAssemblyModule.Write(outFile);
-    }
-
-    public async Task StripAllDlls(string outDir)
-    {
-        await InstallBsipa();
-        
-        var bsLibsDir = Path.Combine(GamePath, "Libs");
-        var bsManagedDir = Path.Combine(GamePath, "Beat Saber_Data", "Managed");
-
-        var outputDir = Path.Combine(GamePath, outDir);
-        if (!Directory.Exists(outputDir)) Directory.CreateDirectory(outputDir);
-
-        var libAssemblies = Directory.GetFiles(bsLibsDir, "*.dll", SearchOption.AllDirectories);
-        var managedAssemblies = Directory.GetFiles(bsManagedDir, "*.dll", SearchOption.AllDirectories);
-
-        AnsiConsole.Progress()
-            .Start(ctx =>
-                {
-                    var task = ctx.AddTask("[salmon1]Stripping assemblies...[/]", new ProgressTaskSettings
-                    {
-                        MaxValue = libAssemblies.Length + managedAssemblies.Length
-                    });
-
-                    foreach (var assembly in libAssemblies.Concat(managedAssemblies))
-                    {
-                        StripDll(assembly, outputDir, bsLibsDir, bsManagedDir);
-                        task.Increment(1);
-                        AnsiConsole.MarkupLine($"[teal]Stripped {assembly}[/]");
-                    }
-                }
-            );
     }
 }

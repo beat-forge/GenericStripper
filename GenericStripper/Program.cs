@@ -40,19 +40,19 @@ internal abstract class Program
             var module = settings.Module.ToLower();
             var path = settings.Path;
             var outDir = settings.Out;
-            
+
             IModule? mod = module switch
             {
                 "beatsaber" => new BeatSaber(path),
                 _ => null
             };
-            
+
             if (mod == null)
             {
                 AnsiConsole.MarkupLine("[red]Invalid module specified![/]");
                 return 1;
             }
-           
+
             await mod.StripAllDlls(outDir);
             return 0;
         }
