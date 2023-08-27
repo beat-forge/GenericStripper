@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+env:
+  GH_TOKEN: ${{ github.token }}
 
 jobs:
   publish:
@@ -15,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
 
       - uses: actions/cache@v3
         with:
@@ -30,11 +32,8 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Upload release asset
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: |
-            bin/Release/net6.0/GenericStripper.exe
-          asset_name: GenericStripper.exe
-          tag: ${{ github.ref }}
+      - name: Zip
+        run: 7z a -tzip -mx=9 GenericStripper.zip GenericStripper/bin/Release/net7.0/
+
+      - name: Publish to Release
+        run: gh release upload ${{ github.ref }} GenericStripper.zip --clobber
