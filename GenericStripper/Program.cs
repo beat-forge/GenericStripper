@@ -1,9 +1,12 @@
-﻿using GenericStripper.Modules.BeatSaber;
+﻿using System.Diagnostics.CodeAnalysis;
+using GenericStripper.Modules;
+using GenericStripper.Modules.BeatSaber;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace GenericStripper;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 internal abstract class Program
 {
     public static int Main(string[] args)
@@ -12,9 +15,9 @@ internal abstract class Program
         return app.Run(args);
     }
 
-    internal sealed class MainCommand : Command<MainCommand.Settings>
+    internal sealed class MainCommand : AsyncCommand<MainCommand.Settings>
     {
-        public override int Execute(CommandContext context, Settings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             if (settings.Module == null)
             {
@@ -34,24 +37,23 @@ internal abstract class Program
                 return 1;
             }
 
-
-            var bs = new BeatSaber(settings.Path);
-            bs.InstallBsipa().Wait();
-
-            var bsLibsDir = Path.Combine(bs.GamePath, "Libs");
-            var bsManagedDir = Path.Combine(bs.GamePath, "Beat Saber_Data", "Managed");
-
-            var outputDir = Path.Combine(bs.GamePath, settings.Out);
-            if (!Directory.Exists(outputDir)) Directory.CreateDirectory(outputDir);
-
-            var libAssemblies = Directory.GetFiles(bsLibsDir, "*.dll", SearchOption.AllDirectories);
-            var managedAssemblies = Directory.GetFiles(bsManagedDir, "*.dll", SearchOption.AllDirectories);
-
-            foreach (var assembly in libAssemblies.Concat(managedAssemblies))
-                bs.StripDll(assembly, outputDir, bsLibsDir, bsManagedDir);
-
-            Console.WriteLine("Done!");
-
+            var module = settings.Module.ToLower();
+            var path = settings.Path;
+            var outDir = settings.Out;
+            
+            IModule? mod = module switch
+            {
+                "beatsaber" => new BeatSaber(path),
+                _ => null
+            };
+            
+            if (mod == null)
+            {
+                AnsiConsole.MarkupLine("[red]Invalid module specified![/]");
+                return 1;
+            }
+           
+            await mod.StripAllDlls(outDir);
             return 0;
         }
 
