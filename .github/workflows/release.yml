@@ -16,6 +16,5 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-          package-name: ${{ github.repository }}
-          monorepo-tags: true
+          package-name: GenericStripper
           release-type: simple
