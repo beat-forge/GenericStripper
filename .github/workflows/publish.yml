@@ -30,11 +30,15 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
+      - name: Debug
+        run: dir
+
       - name: Upload release asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: |
-            bin/Release/net6.0/GenericStripper.dll
+            bin/Release/net7.0/GenericStripper.dll
+            bin/Release/net7.0/GenericStripper.pdb
           asset_name: GenericStripper.dll
           tag: ${{ github.ref }}
