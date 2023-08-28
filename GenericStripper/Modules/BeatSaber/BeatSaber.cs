@@ -122,7 +122,8 @@ public class BeatSaber : IModule
                     {
                         FileName = Path.Combine(GamePath, "IPA.exe"),
                         WorkingDirectory = GamePath,
-                        Arguments = "--nowait"
+                        UseShellExecute = false,
+                        Arguments = "--nowait --force"
                     }
                 };
 
