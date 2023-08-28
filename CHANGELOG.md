@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/beat-forge/GenericStripper/compare/v1.2.3...v1.2.4) (2023-08-28)
+
+
+### Bug Fixes
+
+* it's gonna be a long night isn't it ([5f38243](https://github.com/beat-forge/GenericStripper/commit/5f382430703a889322627a9ff84d92f13746a579))
+
 ## [1.2.3](https://github.com/beat-forge/GenericStripper/compare/v1.2.2...v1.2.3) (2023-08-28)
 
 
