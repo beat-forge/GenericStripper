@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/beat-forge/GenericStripper/compare/v1.2.2...v1.2.3) (2023-08-28)
+
+
+### Bug Fixes
+
+* attempt to fix on ci ([5a263a0](https://github.com/beat-forge/GenericStripper/commit/5a263a0a5faf9dba3222629e21ddbcfbee5e8d5f))
+
 ## [1.2.2](https://github.com/beat-forge/GenericStripper/compare/v1.2.1...v1.2.2) (2023-08-28)
 
 
