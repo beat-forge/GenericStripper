@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/beat-forge/GenericStripper/compare/v1.2.1...v1.2.2) (2023-08-28)
+
+
+### Bug Fixes
+
+* output directory is now a path, not relative to gamedir ([3f44957](https://github.com/beat-forge/GenericStripper/commit/3f44957d14dadda9ba4f6cedd9a59d71d05bd8b7))
+
 ## [1.2.1](https://github.com/beat-forge/generic-stripper/compare/v1.2.0...v1.2.1) (2023-08-27)
 
 
