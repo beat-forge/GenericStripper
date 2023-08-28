@@ -31,20 +31,22 @@ public class BeatSaber : IModule
         bsAssemblyModule.Virtualize();
         bsAssemblyModule.Strip();
 
-        Directory.CreateDirectory(Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.Directory!.ToString())));
-        var outFile = Path.Combine(outDir, Path.GetRelativePath(GamePath, fileInf.FullName));
-        bsAssemblyModule.Write(outFile);
+        var relativePath = Path.GetRelativePath(GamePath, fileInf.FullName);
+        var outAssembly = Path.Combine(outDir, relativePath);
+        if (!Directory.Exists(Path.GetDirectoryName(outAssembly)))
+            Directory.CreateDirectory(Path.GetDirectoryName(outAssembly) ?? string.Empty);
+        
+        bsAssemblyModule.Write(outAssembly);
     }
 
     public async Task StripAllDlls(string outDir)
     {
         await InstallBsipa();
 
+        if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
+        
         var bsLibsDir = Path.Combine(GamePath, "Libs");
         var bsManagedDir = Path.Combine(GamePath, "Beat Saber_Data", "Managed");
-
-        var outputDir = Path.Combine(GamePath, outDir);
-        if (!Directory.Exists(outputDir)) Directory.CreateDirectory(outputDir);
 
         var libAssemblies = Directory.GetFiles(bsLibsDir, "*.dll", SearchOption.AllDirectories);
         var managedAssemblies = Directory.GetFiles(bsManagedDir, "*.dll", SearchOption.AllDirectories);
@@ -59,9 +61,19 @@ public class BeatSaber : IModule
 
                     foreach (var assembly in libAssemblies.Concat(managedAssemblies))
                     {
-                        StripDll(assembly, outputDir, bsLibsDir, bsManagedDir);
+                        var assemblyInf = new FileInfo(assembly);
+                        var relativePath = Path.GetRelativePath(GamePath, assemblyInf.FullName);
+                        var outAssembly = Path.Combine(outDir, relativePath);
+                        if (File.Exists(outAssembly))
+                        {
+                            task.Increment(1);
+                            AnsiConsole.MarkupLine($"[gray]Skipped {assemblyInf.Name}[/]");
+                            continue;
+                        }
+                        
+                        StripDll(assembly, outDir, bsLibsDir, bsManagedDir);
                         task.Increment(1);
-                        AnsiConsole.MarkupLine($"[teal]Stripped {assembly}[/]");
+                        AnsiConsole.MarkupLine($"[teal]Stripped {assemblyInf.Name}[/]");
                     }
                 }
             );
