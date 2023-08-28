@@ -11,11 +11,23 @@ internal abstract class Program
 {
     public static int Main(string[] args)
     {
-        var app = new CommandApp<MainCommand>();
+        var app = new CommandApp();
+        app.Configure(config =>
+        {
+            config.SetApplicationName("GenericStripper");
+            config.AddCommand<StripCommand>("strip")
+                .WithDescription("Strips assemblies of their metadata and virtualizes them.")
+                .WithExample(new[]
+                {
+                    "strip", "-m", "beatsaber", "-p", "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Beat Saber",
+                    "-o", "stripped"
+                });
+        });
+        
         return app.Run(args);
     }
 
-    internal sealed class MainCommand : AsyncCommand<MainCommand.Settings>
+    internal sealed class StripCommand : AsyncCommand<StripCommand.Settings>
     {
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
@@ -60,9 +72,7 @@ internal abstract class Program
         public sealed class Settings : CommandSettings
         {
             [CommandOption("-m|--module")] public string? Module { get; init; }
-
             [CommandOption("-p|--path")] public string? Path { get; init; }
-
             [CommandOption("-o|--out")] public string? Out { get; init; }
         }
     }
