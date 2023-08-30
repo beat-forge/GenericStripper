@@ -34,7 +34,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Zip
-        run: 7z a -tzip -mx=9 GenericStripper.zip GenericStripper/bin/Release/net7.0/
+        run: 7z a -tzip -mx=9 GenericStripper.zip -r GenericStripper/bin/Release/net7.0/*
 
       - name: Publish to Release
         run: gh release upload ${{ github.ref_name }} GenericStripper.zip --clobber
