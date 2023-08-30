@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.6](https://github.com/beat-forge/GenericStripper/compare/v1.2.5...v1.2.6) (2023-08-30)
+
+
+### Bug Fixes
+
+* replace 7z; it's misbehaving. ([9815110](https://github.com/beat-forge/GenericStripper/commit/9815110afafe1e3aca23f1ee7e33bb6330f2da89))
+
 ## [1.2.5](https://github.com/beat-forge/GenericStripper/compare/v1.2.4...v1.2.5) (2023-08-30)
 
 
