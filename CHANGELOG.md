@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/beat-forge/GenericStripper/compare/v1.2.4...v1.2.5) (2023-08-30)
+
+
+### Bug Fixes
+
+* publish with correct directory structure ([0f67bab](https://github.com/beat-forge/GenericStripper/commit/0f67bab78dd2dd4c25068801632ebeeb268ff7ba))
+
 ## [1.2.4](https://github.com/beat-forge/GenericStripper/compare/v1.2.3...v1.2.4) (2023-08-28)
 
 
