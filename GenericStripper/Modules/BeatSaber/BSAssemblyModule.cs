@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 namespace GenericStripper.Modules.BeatSaber;
 
@@ -9,8 +7,6 @@ public class BsAssemblyModule
     private readonly BsLibLoader _bslibLoader;
     private readonly FileInfo _file;
     private readonly ModuleDefinition _module;
-
-    private TypeReference? _inasmref;
 
     public BsAssemblyModule(string gamePath, string fileName, params string[] resolverDirs)
     {

@@ -17,13 +17,10 @@ internal abstract class Program
             config.SetApplicationName("GenericStripper");
             config.AddCommand<StripCommand>("strip")
                 .WithDescription("Strips assemblies of their metadata and virtualizes them.")
-                .WithExample(new[]
-                {
-                    "strip", "-m", "beatsaber", "-p", "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Beat Saber",
-                    "-o", "stripped"
-                });
+                .WithExample("strip", "-m", "beatsaber", "-p",
+                    "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Beat Saber", "-o", "stripped");
         });
-        
+
         return app.Run(args);
     }
 
