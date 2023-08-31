@@ -35,7 +35,7 @@ public class BeatSaber : IModule
         var outAssembly = Path.Combine(outDir, relativePath);
         if (!Directory.Exists(Path.GetDirectoryName(outAssembly)))
             Directory.CreateDirectory(Path.GetDirectoryName(outAssembly) ?? string.Empty);
-        
+
         bsAssemblyModule.Write(outAssembly);
     }
 
@@ -44,7 +44,7 @@ public class BeatSaber : IModule
         await InstallBsipa();
 
         if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
-        
+
         var bsLibsDir = Path.Combine(GamePath, "Libs");
         var bsManagedDir = Path.Combine(GamePath, "Beat Saber_Data", "Managed");
 
@@ -70,7 +70,7 @@ public class BeatSaber : IModule
                             AnsiConsole.MarkupLine($"[gray]Skipped {assemblyInf.Name}[/]");
                             continue;
                         }
-                        
+
                         StripDll(assembly, outDir, bsLibsDir, bsManagedDir);
                         task.Increment(1);
                         AnsiConsole.MarkupLine($"[teal]Stripped {assemblyInf.Name}[/]");
