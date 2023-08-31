@@ -63,27 +63,7 @@ public class BsAssemblyModule
                      IsConstructor: false, IsSpecialName: false, IsGenericInstance: false, HasOverrides: false
                  }))
         {
-            foreach (var p in m.Parameters.Where(p => p.IsIn))
-            {
-                _inasmref ??= _module.ImportReference(typeof(InAttribute));
-                List<TypeReference> opt = new();
-                List<TypeReference> req = new();
-                while (_inasmref is IModifierType modType)
-                {
-                    if (_inasmref.IsOptionalModifier) opt.Add(modType.ModifierType);
-                    else req.Add(modType.ModifierType);
-                    _inasmref = modType.ElementType;
-                }
-
-                if (!req.Contains(_inasmref)) req.Add(_inasmref);
-                foreach (var typeReference in req) _inasmref = _inasmref.MakeRequiredModifierType(typeReference);
-
-                foreach (var typeReference in opt) _inasmref = _inasmref.MakeOptionalModifierType(typeReference);
-
-                p.ParameterType = _inasmref;
-            }
-
-            m.IsVirtual = true;
+            m.IsVirtual = !m.IsPrivate || m.Parameters.FirstOrDefault(p => p.IsIn) == null;
             m.IsPublic = true;
             m.IsPrivate = false;
             m.IsNewSlot = true;
