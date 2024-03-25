@@ -53,23 +53,17 @@ public class BsAssemblyModule
 
         foreach (var subType in type.NestedTypes) VirtualizeType(subType);
 
-        foreach (var group in type.Methods.Where(m => m.IsManaged && m is
+        foreach (var m in type.Methods.Where(m => m.IsManaged && m is
                  {
                      IsIL: true, IsStatic: false, IsVirtual: false, IsAbstract: false, IsAddOn: false,
                      IsConstructor: false, IsSpecialName: false, IsGenericInstance: false, HasOverrides: false
-                 }).GroupBy(m => m.Name))
+                 }))
         {
-            foreach (var m in group)
-            {
-                bool hasAnyInParam = m.Parameters.FirstOrDefault(p => p.IsIn) != null;
-                if (group.Count() > 1 && hasAnyInParam) continue;
-
-                m.IsVirtual = !m.IsPrivate || !hasAnyInParam;
-                m.IsPublic = true;
-                m.IsPrivate = false;
-                m.IsNewSlot = true;
-                m.IsHideBySig = true;
-            }
+            m.IsVirtual = !m.IsPrivate || m.Parameters.FirstOrDefault(p => p.IsIn) == null;
+            m.IsPublic = true;
+            m.IsPrivate = false;
+            m.IsNewSlot = true;
+            m.IsHideBySig = true;
         }
 
         foreach (var field in type.Fields.Where(field => field.IsPrivate)) field.IsFamily = true;
