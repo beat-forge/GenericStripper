@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/beat-forge/GenericStripper/compare/v1.3.0...v1.3.1) (2024-03-25)
+
+
+### Bug Fixes
+
+* bump version for PR ([5ef3c39](https://github.com/beat-forge/GenericStripper/commit/5ef3c39647d8b1cc00ee6d5d8f80657fb11bf9a2))
+
 ## [1.3.0](https://github.com/beat-forge/GenericStripper/compare/v1.2.6...v1.3.0) (2023-08-31)
 
 
